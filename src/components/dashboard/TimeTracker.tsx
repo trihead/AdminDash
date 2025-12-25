@@ -64,28 +64,28 @@ export function TimeTracker() {
           {sessions.map((session) => (
             <div
               key={session.id}
-              className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+              className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <h4 className="font-semibold text-sm">{session.project}</h4>
+                  <h4 className="font-semibold text-sm dark:text-white">{session.project}</h4>
                   <Badge
                     variant="secondary"
                     className={
                       session.status === "active"
-                        ? "bg-green-100 text-green-700"
+                        ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
                         : session.status === "paused"
-                          ? "bg-yellow-100 text-yellow-700"
-                          : "bg-gray-200 text-gray-700"
+                          ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400"
+                          : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
                     }
                   >
                     {session.status}
                   </Badge>
                 </div>
-                <p className="text-sm text-gray-600">{session.task}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300">{session.task}</p>
               </div>
               <div className="flex items-center gap-3">
-                <span className="text-lg font-mono font-semibold">
+                <span className="text-lg font-mono font-semibold dark:text-white">
                   {session.duration}
                 </span>
                 <div className="flex items-center gap-1">

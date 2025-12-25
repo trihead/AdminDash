@@ -58,7 +58,7 @@ export function Header({ onMenuClick, sidebarOpen, onSidebarToggle }: HeaderProp
             variant="ghost"
             size="icon"
             onClick={onSidebarToggle}
-            className="hidden md:flex h-9 w-9"
+            className="hidden md:flex h-9 w-9 text-gray-700 dark:text-gray-200"
           >
             {sidebarOpen ? (
               <PanelLeftClose className="h-5 w-5" />
@@ -72,7 +72,7 @@ export function Header({ onMenuClick, sidebarOpen, onSidebarToggle }: HeaderProp
             variant="ghost"
             size="icon"
             onClick={onMenuClick}
-            className="md:hidden h-9 w-9"
+            className="md:hidden h-9 w-9 text-gray-700 dark:text-gray-200"
           >
             <Menu className="h-5 w-5" />
           </Button>
@@ -83,11 +83,11 @@ export function Header({ onMenuClick, sidebarOpen, onSidebarToggle }: HeaderProp
           {/* Temperature */}
           <WeatherDialog>
             <button className="flex items-center gap-2 text-sm px-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg py-2 transition-colors">
-              <Thermometer className="h-5 w-5 text-purple-600" />
+              <Thermometer className="h-5 w-5 text-purple-600 dark:text-purple-400" />
               <span className="font-semibold text-gray-900 dark:text-gray-100">
                 26
               </span>
-              <span className="text-gray-500">°C</span>
+              <span className="text-gray-500 dark:text-gray-400">°C</span>
             </button>
           </WeatherDialog>
           {/* Language Selector */}
@@ -154,7 +154,7 @@ export function Header({ onMenuClick, sidebarOpen, onSidebarToggle }: HeaderProp
 
           {/* Search */}
           <SearchDialog>
-            <Button variant="ghost" size="icon" className="h-9 w-9">
+            <Button variant="ghost" size="icon" className="h-9 w-9 text-gray-700 dark:text-gray-200">
               <Search className="h-5 w-5" />
             </Button>
           </SearchDialog>
@@ -163,14 +163,14 @@ export function Header({ onMenuClick, sidebarOpen, onSidebarToggle }: HeaderProp
           <Button
             variant="ghost"
             size="icon"
-            className="h-9 w-9"
+            className="h-9 w-9 text-gray-700 dark:text-gray-200"
             onClick={toggleFullscreen}
           >
             <Maximize className="h-5 w-5" />
           </Button>
 
           {/* Shopping Cart */}
-          <Button variant="ghost" size="icon" className="h-9 w-9 relative">
+          <Button variant="ghost" size="icon" className="h-9 w-9 relative text-gray-700 dark:text-gray-200">
             <ShoppingCart className="h-5 w-5" />
             <Badge className="absolute -top-0.5 -right-0.5 h-4 w-4 flex items-center justify-center p-0 text-[10px] bg-purple-600 hover:bg-purple-700 border-0">
               4
@@ -181,7 +181,7 @@ export function Header({ onMenuClick, sidebarOpen, onSidebarToggle }: HeaderProp
           <Button
             variant="ghost"
             size="icon"
-            className="h-9 w-9"
+            className="h-9 w-9 text-gray-700 dark:text-gray-200"
             onClick={toggleTheme}
           >
             {theme === "dark" ? (
@@ -194,9 +194,9 @@ export function Header({ onMenuClick, sidebarOpen, onSidebarToggle }: HeaderProp
           {/* Notifications */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-9 w-9 relative">
+              <Button variant="ghost" size="icon" className="h-9 w-9 relative text-gray-700 dark:text-gray-200">
                 <Bell className="h-5 w-5" />
-                <span className="absolute top-1.5 right-2 h-2 w-2 bg-green-500 rounded-full border-2 border-white"></span>
+                <span className="absolute top-1.5 right-2 h-2 w-2 bg-green-500 rounded-full border-2 border-white dark:border-gray-900"></span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-80">
@@ -204,20 +204,20 @@ export function Header({ onMenuClick, sidebarOpen, onSidebarToggle }: HeaderProp
               <DropdownMenuSeparator />
               <DropdownMenuItem>
                 <div className="flex flex-col gap-1">
-                  <p className="text-sm font-medium">New project assigned</p>
-                  <p className="text-xs text-gray-500">2 hours ago</p>
+                  <p className="text-sm font-medium dark:text-white">New project assigned</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">2 hours ago</p>
                 </div>
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <div className="flex flex-col gap-1">
-                  <p className="text-sm font-medium">Meeting reminder</p>
-                  <p className="text-xs text-gray-500">1 day ago</p>
+                  <p className="text-sm font-medium dark:text-white">Meeting reminder</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">1 day ago</p>
                 </div>
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <div className="flex flex-col gap-1">
-                  <p className="text-sm font-medium">Task completed</p>
-                  <p className="text-xs text-gray-500">1 day ago</p>
+                  <p className="text-sm font-medium dark:text-white">Task completed</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">1 day ago</p>
                 </div>
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -240,7 +240,7 @@ export function Header({ onMenuClick, sidebarOpen, onSidebarToggle }: HeaderProp
                 <div className="flex flex-col">
                   <span className="font-medium">Andrew Stevens</span>
                   <span className="text-xs text-gray-500 font-normal">
-                    admin@axelit.com
+                    admin@iworx.pro
                   </span>
                 </div>
               </DropdownMenuLabel>

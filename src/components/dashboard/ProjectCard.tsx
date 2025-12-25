@@ -39,12 +39,12 @@ export function ProjectCard({
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
-              <h3 className="font-semibold text-lg">{title}</h3>
+              <h3 className="font-semibold text-lg dark:text-white">{title}</h3>
               <Badge className={statusColors[status]} variant="secondary">
                 {status}
               </Badge>
             </div>
-            <p className="text-sm text-gray-600">{description}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-300">{description}</p>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -65,10 +65,10 @@ export function ProjectCard({
         {/* Progress Bar */}
         <div className="mb-4">
           <div className="flex items-center justify-between text-sm mb-2">
-            <span className="text-gray-600">Progress</span>
-            <span className="font-medium">{progress}%</span>
+            <span className="text-gray-600 dark:text-gray-300">Progress</span>
+            <span className="font-medium dark:text-white">{progress}%</span>
           </div>
-          <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+          <div className="h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
             <div
               className="h-full bg-gradient-to-r from-blue-500 to-purple-600 rounded-full transition-all"
               style={{ width: `${progress}%` }}
@@ -80,7 +80,7 @@ export function ProjectCard({
         <div className="flex items-center justify-between">
           <div className="flex -space-x-2">
             {team.slice(0, 4).map((member, index) => (
-              <Avatar key={index} className="h-8 w-8 border-2 border-white">
+              <Avatar key={index} className="h-8 w-8 border-2 border-white dark:border-gray-800">
                 <AvatarImage src={member.avatar} alt={member.name} />
                 <AvatarFallback className="text-xs bg-gradient-to-br from-blue-500 to-purple-600 text-white">
                   {member.name
@@ -91,12 +91,12 @@ export function ProjectCard({
               </Avatar>
             ))}
             {team.length > 4 && (
-              <div className="h-8 w-8 rounded-full bg-gray-200 border-2 border-white flex items-center justify-center text-xs font-medium">
+              <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 border-2 border-white dark:border-gray-800 flex items-center justify-center text-xs font-medium dark:text-white">
                 +{team.length - 4}
               </div>
             )}
           </div>
-          <span className="text-sm text-gray-500">Due: {dueDate}</span>
+          <span className="text-sm text-gray-500 dark:text-gray-400">Due: {dueDate}</span>
         </div>
       </CardContent>
     </Card>

@@ -125,6 +125,7 @@ interface SidebarProps {
 export function Sidebar({ isOpen, onClose, isMobile = false }: SidebarProps) {
   const pathname = usePathname();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
+  const [isHovered, setIsHovered] = useState(false);
 
   const toggleExpand = (itemName: string) => {
     setExpandedItems((prev) =>
@@ -134,17 +135,22 @@ export function Sidebar({ isOpen, onClose, isMobile = false }: SidebarProps) {
     );
   };
 
+  const showExpanded = isOpen || (isHovered && !isMobile);
+
   return (
     <aside
+      onMouseEnter={() => !isMobile && setIsHovered(true)}
+      onMouseLeave={() => !isMobile && setIsHovered(false)}
       className={cn(
         "fixed inset-y-0 left-0 z-50 flex flex-col bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 font-[family-name:var(--font-montserrat)]",
-        isOpen ? "w-64" : "w-0 md:w-16",
-        isMobile && !isOpen && "hidden"
+        showExpanded ? "w-64" : "w-0 md:w-16",
+        isMobile && !isOpen && "hidden",
+        !isOpen && isHovered && "shadow-xl z-50"
       )}
     >
       {/* Logo Area */}
       <div className="flex h-16 items-center justify-between px-4 border-b border-gray-200 dark:border-gray-700">
-        {isOpen && (
+        {showExpanded && (
           <>
             <Link href="/" className="flex items-center gap-2">
               <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
@@ -164,7 +170,7 @@ export function Sidebar({ isOpen, onClose, isMobile = false }: SidebarProps) {
             )}
           </>
         )}
-        {!isOpen && !isMobile && (
+        {!showExpanded && !isMobile && (
           <div className="w-full flex justify-center">
             <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-xs">AD</span>
@@ -178,7 +184,7 @@ export function Sidebar({ isOpen, onClose, isMobile = false }: SidebarProps) {
         <nav className="space-y-6">
           {navigation.map((section, sectionIdx) => (
             <div key={sectionIdx} className="space-y-1">
-              {section.section && isOpen && (
+              {section.section && showExpanded && (
                 <h3 className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
                   {section.section}
                 </h3>
@@ -198,12 +204,12 @@ export function Sidebar({ isOpen, onClose, isMobile = false }: SidebarProps) {
                           "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                           isActive
                             ? "bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400"
-                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100",
-                          !isOpen && "justify-center"
+                            : "text-gray-700 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white",
+                          !showExpanded && "justify-center"
                         )}
                       >
                         {Icon && <Icon className="h-5 w-5 shrink-0" />}
-                        {isOpen && (
+                        {showExpanded && (
                           <>
                             <span className="flex-1 text-left">{item.name}</span>
                             {item.badge && (
@@ -230,12 +236,12 @@ export function Sidebar({ isOpen, onClose, isMobile = false }: SidebarProps) {
                           "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                           isActive
                             ? "bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400"
-                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-gray-100",
-                          !isOpen && "justify-center"
+                            : "text-gray-700 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white",
+                          !showExpanded && "justify-center"
                         )}
                       >
                         {Icon && <Icon className="h-5 w-5 shrink-0" />}
-                        {isOpen && (
+                        {showExpanded && (
                           <>
                             <span className="flex-1">{item.name}</span>
                             {item.badge && (
@@ -252,7 +258,7 @@ export function Sidebar({ isOpen, onClose, isMobile = false }: SidebarProps) {
                     )}
 
                     {/* Sub Items */}
-                    {item.subItems && isExpanded && isOpen && (
+                    {item.subItems && isExpanded && showExpanded && (
                       <div className="ml-8 mt-1 space-y-1">
                         {item.subItems.map((subItem) => {
                           const isSubActive = pathname === subItem.href;
@@ -264,7 +270,7 @@ export function Sidebar({ isOpen, onClose, isMobile = false }: SidebarProps) {
                                 "flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors",
                                 isSubActive
                                   ? "text-blue-600 dark:text-blue-400 font-medium"
-                                  : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
+                                  : "text-gray-600 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white"
                               )}
                             >
                               <span className="flex-1">{subItem.name}</span>
@@ -293,7 +299,7 @@ export function Sidebar({ isOpen, onClose, isMobile = false }: SidebarProps) {
       {isOpen && !isMobile && (
         <div className="p-4 border-t border-gray-200">
           <div className="flex items-center gap-2 px-3 py-2 text-xs text-gray-500">
-            <span>© 2025 axelit</span>
+            <span>© 2025 iWorx.Pro</span>
           </div>
         </div>
       )}
