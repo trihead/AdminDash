@@ -112,6 +112,7 @@ const navigation: NavSection[] = [
       { name: "Map", icon: Map, href: "/map" },
       { name: "Chart", icon: BarChart, href: "/chart" },
       { name: "Table & forms", icon: Table, href: "/tables", badge: "4.2" },
+      { name: "Spreadsheet", icon: Table, href: "/spreadsheet" },
     ],
   },
 ];
