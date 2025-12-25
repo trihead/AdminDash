@@ -6,7 +6,15 @@ import { ColDef, ModuleRegistry } from "ag-grid-community";
 import { AllCommunityModule } from "ag-grid-community";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, Upload, Plus, Trash2 } from "lucide-react";
+import { Download, Upload, Plus, Trash2, Edit3 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
+} from "@/components/ui/dropdown-menu";
 
 import "ag-grid-community/styles/ag-theme-quartz.css";
 
@@ -168,6 +176,52 @@ export default function SpreadsheetPage() {
     []
   );
 
+  const deleteColumn = useCallback((field: string) => {
+    if (field === "id") {
+      alert("Cannot delete ID column");
+      return;
+    }
+    if (confirm(`Delete column "${field}"?`)) {
+      setColumnDefs(columnDefs.filter(col => col.field !== field));
+    }
+  }, [columnDefs]);
+
+  const renameColumn = useCallback((field: string) => {
+    if (field === "id") {
+      alert("Cannot rename ID column");
+      return;
+    }
+    const newName = prompt("Enter new column name:");
+    if (newName) {
+      setColumnDefs(columnDefs.map(col => 
+        col.field === field ? { ...col, headerName: newName } : col
+      ));
+    }
+  }, [columnDefs]);
+
+  const getContextMenuItems = useCallback((params: any) => {
+    if (!params.column) return [];
+    
+    const field = params.column.getColId();
+    
+    return [
+      {
+        name: "Rename Column",
+        action: () => renameColumn(field),
+        icon: '<span>✏️</span>',
+      },
+      {
+        name: "Delete Column",
+        action: () => deleteColumn(field),
+        icon: '<span>🗑️</span>',
+      },
+      "separator",
+      "copy",
+      "copyWithHeaders",
+      "paste",
+    ];
+  }, [renameColumn, deleteColumn]);
+
   const addRow = useCallback(() => {
     const newId = Math.max(...rowData.map((r) => r.id), 0) + 1;
     const newRow: RowData = {
@@ -293,6 +347,51 @@ export default function SpreadsheetPage() {
                 <Plus className="h-4 w-4" />
                 Add Column
               </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="gap-2"
+                  >
+                    <Edit3 className="h-4 w-4" />
+                    Manage Columns
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>Edit Columns</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {columnDefs.map((col) => (
+                    col.field !== "id" && (
+                      <DropdownMenuItem
+                        key={col.field}
+                        className="flex items-center justify-between"
+                        onSelect={(e) => e.preventDefault()}
+                      >
+                        <span className="flex-1">{col.headerName}</span>
+                        <div className="flex gap-1">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-6 w-6 p-0"
+                            onClick={() => renameColumn(col.field!)}
+                          >
+                            ✏️
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-6 w-6 p-0"
+                            onClick={() => deleteColumn(col.field!)}
+                          >
+                            🗑️
+                          </Button>
+                        </div>
+                      </DropdownMenuItem>
+                    )
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
               <Button
                 size="sm"
                 variant="outline"
@@ -300,7 +399,7 @@ export default function SpreadsheetPage() {
                 onClick={deleteSelected}
               >
                 <Trash2 className="h-4 w-4" />
-                Delete
+                Delete Rows
               </Button>
               <Button
                 size="sm"
@@ -324,7 +423,10 @@ export default function SpreadsheetPage() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="ag-theme-quartz dark:ag-theme-quartz-dark" style={{ height: 600 }}>
+          <div 
+            className="ag-theme-quartz dark:ag-theme-quartz-dark" 
+            style={{ height: 600 }}
+          >
             <AgGridReact
               ref={gridRef}
               rowData={rowData}
@@ -349,6 +451,17 @@ export default function SpreadsheetPage() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600 dark:text-gray-300">
+            <div>
+              <h4 className="font-semibold mb-2 text-gray-900 dark:text-white">
+                Column Management
+              </h4>
+              <ul className="space-y-1">
+                <li>• Click "Manage Columns" button</li>
+                <li>• Click ✏️ to rename columns</li>
+                <li>• Click 🗑️ to delete columns</li>
+                <li>• Drag column headers to reorder</li>
+              </ul>
+            </div>
             <div>
               <h4 className="font-semibold mb-2 text-gray-900 dark:text-white">
                 Keyboard Navigation
