@@ -66,32 +66,23 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Total Hours Card */}
+      {/* Top Row: Total Hours + Projects + Weather */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="md:col-span-1">
           <TotalHoursCard />
         </div>
         <div className="md:col-span-3">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {projects.slice(0, 3).map((project, index) => (
-              <ProjectCard key={index} {...project} />
-            ))}
+            <ProjectCard {...projects[0]} />
+            <ProjectCard {...projects[1]} />
+            <WeatherWidget />
           </div>
         </div>
       </div>
 
-      {/* Weather Forecast and Project Cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-6 gap-6">
-        <div className="lg:col-span-2">
-          <ProjectCard {...projects[2]} />
-        </div>
-        <div className="lg:col-span-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {projects.slice(3).map((project, index) => (
-              <ProjectCard key={index} {...project} />
-            ))}
-          </div>
-        </div>
+      {/* Bottom Row: Core Team */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <ProjectCard {...projects[3]} />
       </div>
 
       {/* Revenue Chart */}

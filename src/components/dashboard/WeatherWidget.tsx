@@ -2,9 +2,17 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Cloud, CloudRain, Sun, MapPin, Loader2, MoreVertical } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+import { 
+  Cloud, 
+  CloudRain, 
+  Sun, 
+  MapPin, 
+  Loader2, 
+  MoreVertical, 
+  ChevronDown, 
+  ChevronRight,
+  Thermometer
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -141,9 +149,9 @@ export function WeatherWidget() {
 
   if (loading) {
     return (
-      <Card className="hover:shadow-md transition-shadow">
+      <Card className="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 text-white border-0">
         <CardContent className="p-6 flex items-center justify-center py-16">
-          <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+          <Loader2 className="w-8 h-8 animate-spin text-white" />
         </CardContent>
       </Card>
     );
@@ -151,35 +159,30 @@ export function WeatherWidget() {
 
   if (error || !weather) {
     return (
-      <Card className="hover:shadow-md transition-shadow">
+      <Card className="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 text-white border-0">
         <CardContent className="p-6">
-          <p className="text-sm text-gray-500">Unable to load weather data</p>
+          <p className="text-sm text-white/80 text-center">Unable to load weather data</p>
         </CardContent>
       </Card>
     );
   }
 
   const currentDay = weather.forecast[0];
+  const upcomingDays = weather.forecast.slice(0, 5);
 
   return (
-    <Card className="hover:shadow-md transition-shadow">
+    <Card className="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 text-white border-0 overflow-hidden">
       <CardContent className="p-6">
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
-              <h3 className="font-semibold text-lg dark:text-white">{weather.location}</h3>
-              <Badge className="bg-blue-100 text-blue-700" variant="secondary">
-                {currentDay.condition}
-              </Badge>
-            </div>
-            <p className="text-sm text-gray-600 dark:text-gray-300 flex items-center gap-1">
-              <MapPin className="w-3 h-3" />
-              Current weather conditions
-            </p>
+        {/* Header with Location */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <MapPin className="w-5 h-5 text-white/90" />
+            <h3 className="text-lg font-semibold">{weather.location}</h3>
+            <ChevronDown className="w-4 h-4 text-white/80" />
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
+              <Button variant="ghost" size="icon" className="h-8 w-8 text-white hover:bg-white/10">
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -191,40 +194,67 @@ export function WeatherWidget() {
           </DropdownMenu>
         </div>
 
-        {/* Temperature Progress */}
-        <div className="mb-4">
-          <div className="flex items-center justify-between text-sm mb-2">
-            <span className="text-gray-600 dark:text-gray-300">Temperature</span>
-            <span className="font-medium dark:text-white">{currentDay.temp}°</span>
-          </div>
-          <div className="h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-gradient-to-r from-blue-500 to-purple-600 rounded-full transition-all"
-              style={{ width: `${Math.min((currentDay.temp / 100) * 100, 100)}%` }}
-            />
+        {/* Current Weather - Large Display */}
+        <div className="flex items-center gap-4 mb-3">
+          <WeatherIcon condition={currentDay.condition} className="w-16 h-16" />
+          <div className="flex-1">
+            <div className="text-5xl font-light">
+              {weather.currentTemp || currentDay.temp}°
+              <span className="text-2xl ml-1 opacity-80">F</span>
+            </div>
           </div>
         </div>
 
-        {/* Forecast Days and Precipitation */}
-        <div className="flex items-center justify-between">
-          <div className="flex -space-x-2">
-            {weather.forecast.slice(0, 4).map((day, index) => (
-              <Avatar key={index} className="h-8 w-8 border-2 border-white dark:border-gray-800">
-                <AvatarFallback className="text-xs bg-gradient-to-br from-blue-500 to-purple-600 text-white">
-                  {day.day.substring(0, 2)}
-                </AvatarFallback>
-              </Avatar>
-            ))}
-            {weather.forecast.length > 4 && (
-              <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 border-2 border-white dark:border-gray-800 flex items-center justify-center text-xs font-medium dark:text-white">
-                +{weather.forecast.length - 4}
-              </div>
-            )}
+        {/* Weather Alert */}
+        {currentDay.tempMax && currentDay.tempMax > 80 && (
+          <div className="flex items-start gap-2 mb-4 p-3 bg-white/10 rounded-lg backdrop-blur-sm">
+            <Thermometer className="w-4 h-4 text-orange-300 flex-shrink-0 mt-0.5" />
+            <div className="text-sm text-white/90">
+              Tomorrow's high may break the record for {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+            </div>
+            <ChevronRight className="w-4 h-4 text-white/70 flex-shrink-0 mt-0.5" />
           </div>
-          <span className="text-sm text-gray-500 dark:text-gray-400">
-            <CloudRain className="w-4 h-4 inline mr-1" />
-            {currentDay.precipitation}%
-          </span>
+        )}
+
+        {/* Toggle Buttons */}
+        <div className="flex gap-2 mb-4">
+          <Button 
+            size="sm" 
+            className="bg-white/20 hover:bg-white/30 text-white border-0 backdrop-blur-sm"
+          >
+            Hourly
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="hover:bg-white/10 text-white/80 border-0"
+          >
+            Daily
+          </Button>
+        </div>
+
+        {/* 5-Day Forecast */}
+        <div className="grid grid-cols-5 gap-2 mb-4">
+          {upcomingDays.map((day, index) => (
+            <div
+              key={index}
+              className="flex flex-col items-center gap-2 p-3 rounded-lg bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-colors"
+            >
+              <span className="text-sm font-medium">{index === 0 ? "Today" : day.day}</span>
+              <WeatherIcon condition={day.condition} className="w-10 h-10" />
+              <div className="text-center">
+                <div className="text-lg font-semibold">{day.tempMax || day.temp}°</div>
+                <div className="text-sm text-white/70">{day.tempMin || Math.floor(day.temp * 0.8)}°</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Footer */}
+        <div className="flex justify-center pt-2 border-t border-white/10">
+          <button className="text-sm text-white/80 hover:text-white transition-colors">
+            See full forecast
+          </button>
         </div>
       </CardContent>
     </Card>
