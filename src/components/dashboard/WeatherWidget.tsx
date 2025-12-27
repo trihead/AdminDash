@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { 
   Cloud, 
@@ -20,22 +19,29 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useWeather } from "@/contexts/WeatherContext";
 
-interface WeatherDay {
-  date: string;
-  day: string;
-  temp: number;
-  tempMin?: number;
-  tempMax?: number;
-  condition: string;
-  precipitation: number;
-}
-
-interface WeatherData {
-  location: string;
-  forecast: WeatherDay[];
-  currentTemp?: number;
-}
+const getWeatherBackgroundImage = (condition: string): string => {
+  const cond = condition.toLowerCase();
+  const baseUrl = "https://assets.msn.com/weathermapdata/1/static/background/v2.0/jpg";
+  
+  if (cond.includes("clear") || cond.includes("sunny")) {
+    return `${baseUrl}/sunny.jpg`;
+  } else if (cond.includes("cloud") && !cond.includes("rain")) {
+    return `${baseUrl}/cloudy.jpg`;
+  } else if (cond.includes("rain") || cond.includes("drizzle")) {
+    return `${baseUrl}/rainy.jpg`;
+  } else if (cond.includes("snow")) {
+    return `${baseUrl}/snowy.jpg`;
+  } else if (cond.includes("thunder") || cond.includes("storm")) {
+    return `${baseUrl}/thunderstorms.jpg`;
+  } else if (cond.includes("fog") || cond.includes("mist")) {
+    return `${baseUrl}/foggy.jpg`;
+  }
+  
+  // Default to partly cloudy
+  return `${baseUrl}/partlycloudy.jpg`;
+};
 
 const getWeatherBackground = (condition: string) => {
   const cond = condition.toLowerCase();
@@ -52,7 +58,6 @@ const getWeatherBackground = (condition: string) => {
     return "bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900";
   }
   
-  // Default blue gradient
   return "bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800";
 };
 
@@ -71,101 +76,7 @@ const WeatherIcon = ({ condition, className = "w-8 h-8" }: { condition: string; 
 };
 
 export function WeatherWidget() {
-  const [weather, setWeather] = useState<WeatherData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchRealWeatherData = async (lat: number, lon: number): Promise<WeatherData> => {
-    try {
-      const response = await fetch(`/api/weather/forecast?lat=${lat}&lon=${lon}`);
-
-      if (!response.ok) {
-        throw new Error("Weather API request failed");
-      }
-
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error("Error fetching weather:", error);
-      throw error;
-    }
-  };
-
-  const generateMockWeather = (lat: number, lon: number): WeatherData => {
-    const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-    const conditions: Array<"sunny" | "cloudy" | "rainy" | "partly-cloudy"> = [
-      "rainy", "partly-cloudy", "sunny", "sunny", "sunny", "sunny", "sunny"
-    ];
-    
-    // Determine location name based on coordinates (simplified)
-    let location = "Your Location";
-    if (Math.abs(lat - 37.7749) < 1 && Math.abs(lon - -122.4194) < 1) {
-      location = "San Francisco, CA";
-    }
-
-    const today = new Date();
-
-    return {
-      location,
-      forecast: days.map((day, index) => {
-        const date = new Date(today);
-        date.setDate(today.getDate() + index);
-        
-        return {
-          date: date.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
-          day,
-          temp: Math.round(18 + Math.random() * 10),
-          condition: conditions[index] || "sunny",
-          precipitation: Math.round(Math.random() * 30)
-        };
-      })
-    };
-  };
-
-  useEffect(() => {
-    const fetchWeather = async () => {
-      try {
-        // Get user's location
-        if ("geolocation" in navigator) {
-          navigator.geolocation.getCurrentPosition(
-            async (position) => {
-              const { latitude, longitude } = position.coords;
-              
-              // Try to fetch real weather data
-              try {
-                const weatherData = await fetchRealWeatherData(latitude, longitude);
-                setWeather(weatherData);
-                setLoading(false);
-              } catch (apiError) {
-                // Fallback to mock data if API fails
-                console.log("Using mock weather data");
-                const mockWeather = generateMockWeather(latitude, longitude);
-                setWeather(mockWeather);
-                setLoading(false);
-              }
-            },
-            (error) => {
-              console.error("Geolocation error:", error);
-              // Fallback to default location
-              const defaultWeather = generateMockWeather(37.7749, -122.4194); // San Francisco
-              setWeather(defaultWeather);
-              setLoading(false);
-            }
-          );
-        } else {
-          // Geolocation not available, use default
-          const defaultWeather = generateMockWeather(37.7749, -122.4194);
-          setWeather(defaultWeather);
-          setLoading(false);
-        }
-      } catch (err) {
-        setError("Failed to load weather data");
-        setLoading(false);
-      }
-    };
-
-    fetchWeather();
-  }, []);
+  const { weather, loading, error, tempUnit } = useWeather();
 
   if (loading) {
     return (
@@ -189,11 +100,23 @@ export function WeatherWidget() {
 
   const currentDay = weather.forecast[0];
   const upcomingDays = weather.forecast.slice(0, 5);
+  const backgroundImage = getWeatherBackgroundImage(currentDay.condition);
   const bgClass = getWeatherBackground(currentDay.condition);
 
   return (
-    <Card className={`${bgClass} text-white border-0 overflow-hidden`}>
-      <CardContent className="p-6">
+    <Card className="text-white border-0 overflow-hidden relative">
+      {/* Background Image */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ 
+          backgroundImage: `url('${backgroundImage}')`,
+        }}
+      />
+      {/* Overlay for better text readability */}
+      <div className={`absolute inset-0 ${bgClass} opacity-60`} />
+      
+      {/* Content */}
+      <CardContent className="p-6 relative z-10">
         {/* Header with Location */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
@@ -220,18 +143,20 @@ export function WeatherWidget() {
           <WeatherIcon condition={currentDay.condition} className="w-16 h-16" />
           <div className="flex-1">
             <div className="text-5xl font-light">
-              {weather.currentTemp || currentDay.temp}°
-              <span className="text-2xl ml-1 opacity-80">F</span>
+              {tempUnit === "F" 
+                ? Math.round(currentDay.tempMaxF || currentDay.tempF || currentDay.temp) 
+                : Math.round(currentDay.tempMax || currentDay.temp)}°
+              <span className="text-2xl ml-1 opacity-80">{tempUnit}</span>
             </div>
           </div>
         </div>
 
         {/* Weather Alert */}
-        {currentDay.tempMax && currentDay.tempMax > 80 && (
+        {currentDay.tempMax && currentDay.tempMax > 30 && (
           <div className="flex items-start gap-2 mb-4 p-3 bg-white/10 rounded-lg backdrop-blur-sm">
             <Thermometer className="w-4 h-4 text-orange-300 flex-shrink-0 mt-0.5" />
             <div className="text-sm text-white/90">
-              Tomorrow's high may break the record for {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+              Tomorrow&apos;s high may break the record for {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
             </div>
             <ChevronRight className="w-4 h-4 text-white/70 flex-shrink-0 mt-0.5" />
           </div>
@@ -264,8 +189,16 @@ export function WeatherWidget() {
               <span className="text-sm font-medium">{index === 0 ? "Today" : day.day}</span>
               <WeatherIcon condition={day.condition} className="w-10 h-10" />
               <div className="text-center">
-                <div className="text-lg font-semibold">{day.tempMax || day.temp}°</div>
-                <div className="text-sm text-white/70">{day.tempMin || Math.floor(day.temp * 0.8)}°</div>
+                <div className="text-lg font-semibold">
+                  {tempUnit === "F" 
+                    ? Math.round(day.tempMaxF || day.tempF || day.temp) 
+                    : Math.round(day.tempMax || day.temp)}°
+                </div>
+                <div className="text-sm text-white/70">
+                  {tempUnit === "F" 
+                    ? Math.round(day.tempMinF || Math.floor((day.tempMin || day.temp * 0.8) * 9/5 + 32))
+                    : Math.round(day.tempMin || Math.floor(day.temp * 0.8))}°
+                </div>
               </div>
             </div>
           ))}

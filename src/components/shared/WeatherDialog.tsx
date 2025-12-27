@@ -16,10 +16,10 @@ import {
   CloudLightning,
   Loader2
 } from "lucide-react";
+import { useWeather } from "@/contexts/WeatherContext";
 
 interface WeatherDialogProps {
   children: React.ReactNode;
-  onWeatherUpdate?: (temp: number, unit: string) => void;
 }
 
 interface WeatherDay {
@@ -68,91 +68,25 @@ const getTemperatureUnit = (): "C" | "F" => {
   return "C";
 };
 
-export function WeatherDialog({ children, onWeatherUpdate }: WeatherDialogProps) {
+export function WeatherDialog({ children }: WeatherDialogProps) {
+  const { weather, loading, error, tempUnit } = useWeather();
   const [weatherData, setWeatherData] = useState<WeatherDay[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [tempUnit, setTempUnit] = useState<"C" | "F">("C");
-  const [location, setLocation] = useState<string>("");
 
   useEffect(() => {
-    // Detect temperature unit based on user's locale
-    const unit = getTemperatureUnit();
-    setTempUnit(unit);
-    fetchWeatherData(unit);
-  }, []);
-
-  const fetchWeatherData = async (unit: "C" | "F") => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      // Get user's geolocation
-      if (!navigator.geolocation) {
-        throw new Error("Geolocation is not supported");
-      }
-
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const { latitude, longitude } = position.coords;
-
-          try {
-            // Fetch weather data from API
-            const response = await fetch(
-              `/api/weather/forecast?lat=${latitude}&lon=${longitude}&units=${unit === "F" ? "imperial" : "metric"}`
-            );
-
-            if (!response.ok) {
-              const errorData = await response.json();
-              throw new Error(errorData.error || "Failed to fetch weather data");
-            }
-
-            const data = await response.json();
-
-            if (data.error) {
-              throw new Error(data.error);
-            }
-
-            // Transform API data to WeatherDay format
-            const forecast: WeatherDay[] = data.forecast.map((item: any, index: number) => {
-              const temperature = unit === "F" ? item.tempF : item.temp;
-              
-              return {
-                day: index === 0 ? "Today" : item.day,
-                temp: `${temperature}°${unit}`,
-                icon: <WeatherIcon condition={item.condition} />,
-                precipitation: item.precipitation ? `${item.precipitation}%` : "0%",
-              };
-            });
-
-            setWeatherData(forecast);
-            setLocation(data.location || "");
-
-            // Update header temperature
-            if (onWeatherUpdate && forecast.length > 0) {
-              const currentTemp = unit === "F" ? data.forecast[0].tempF : data.forecast[0].temp;
-              onWeatherUpdate(currentTemp, unit);
-            }
-
-            setLoading(false);
-          } catch (err) {
-            console.error("Weather API error:", err);
-            setError(err instanceof Error ? err.message : "Unable to fetch weather data");
-            setLoading(false);
-          }
-        },
-        (err) => {
-          console.error("Geolocation error:", err);
-          setError("Location access denied. Please enable location access in your browser.");
-          setLoading(false);
-        }
-      );
-    } catch (err) {
-      console.error("Weather fetch error:", err);
-      setError("Unable to load weather");
-      setLoading(false);
+    if (weather?.forecast) {
+      const forecast: WeatherDay[] = weather.forecast.map((item: any, index: number) => {
+        const temperature = tempUnit === "F" ? (item.tempF || item.temp) : item.temp;
+        
+        return {
+          day: index === 0 ? "Today" : item.day,
+          temp: `${Math.round(temperature)}°${tempUnit}`,
+          icon: <WeatherIcon condition={item.condition} />,
+          precipitation: item.precipitation ? `${item.precipitation}%` : "0%",
+        };
+      });
+      setWeatherData(forecast);
     }
-  };
+  }, [weather, tempUnit]);
 
   return (
     <Popover>
@@ -169,19 +103,13 @@ export function WeatherDialog({ children, onWeatherUpdate }: WeatherDialogProps)
         ) : error ? (
           <div className="flex flex-col items-center justify-center py-12 px-6 text-center">
             <p className="text-sm opacity-90 mb-3">{error}</p>
-            <button
-              onClick={() => fetchWeatherData(tempUnit)}
-              className="text-xs underline opacity-75 hover:opacity-100"
-            >
-              Try again
-            </button>
           </div>
         ) : (
           <div>
-            {location && (
+            {weather?.location && (
               <div className="px-6 py-4 border-b border-purple-400/30">
                 <p className="text-sm font-medium opacity-90 text-center">
-                  {location}
+                  {weather.location}
                 </p>
               </div>
             )}

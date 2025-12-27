@@ -8,6 +8,7 @@ import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/shared/ThemeProvider";
 import { CompanyProvider } from "@/contexts/CompanyContext";
+import { WeatherProvider } from "@/contexts/WeatherContext";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -20,7 +21,8 @@ export function AppLayout({ children }: AppLayoutProps) {
   return (
     <ThemeProvider>
       <CompanyProvider>
-        <div className="flex h-screen overflow-hidden bg-gray-50 dark:bg-gray-950">
+        <WeatherProvider>
+          <div className="flex h-screen overflow-hidden bg-gray-50 dark:bg-gray-950">
       {/* Desktop Sidebar */}
       <div className="hidden md:block">
         <Sidebar isOpen={sidebarOpen} />
@@ -57,6 +59,7 @@ export function AppLayout({ children }: AppLayoutProps) {
         <Footer />
       </div>
         </div>
+        </WeatherProvider>
       </CompanyProvider>
     </ThemeProvider>
   );

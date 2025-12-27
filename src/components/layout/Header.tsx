@@ -25,6 +25,7 @@ import { useState } from "react";
 import { useTheme } from "@/components/shared/ThemeProvider";
 import { SearchDialog } from "@/components/shared/SearchDialog";
 import { WeatherDialog } from "@/components/shared/WeatherDialog";
+import { useWeather } from "@/contexts/WeatherContext";
 import ReactCountryFlag from "react-country-flag";
 import { PanelLeft, PanelLeftClose } from "lucide-react";
 
@@ -36,9 +37,12 @@ interface HeaderProps {
 
 export function Header({ onMenuClick, sidebarOpen, onSidebarToggle }: HeaderProps) {
   const { theme, toggleTheme } = useTheme();
+  const { weather, tempUnit } = useWeather();
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [currentTemp, setCurrentTemp] = useState<number | null>(null);
-  const [tempUnit, setTempUnit] = useState<string>("C");
+
+  const currentTemp = weather?.forecast?.[0] 
+    ? (tempUnit === "F" ? (weather.forecast[0].tempMaxF || weather.forecast[0].tempF || weather.forecast[0].temp) : weather.forecast[0].temp)
+    : null;
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -48,11 +52,6 @@ export function Header({ onMenuClick, sidebarOpen, onSidebarToggle }: HeaderProp
       document.exitFullscreen();
       setIsFullscreen(false);
     }
-  };
-
-  const handleWeatherUpdate = (temp: number, unit: string) => {
-    setCurrentTemp(temp);
-    setTempUnit(unit);
   };
 
   return (
@@ -88,11 +87,11 @@ export function Header({ onMenuClick, sidebarOpen, onSidebarToggle }: HeaderProp
         {/* Right Side Actions */}
         <div className="flex items-center gap-1 ml-auto">
           {/* Temperature */}
-          <WeatherDialog onWeatherUpdate={handleWeatherUpdate}>
+          <WeatherDialog>
             <button className="flex items-center gap-2 text-sm px-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg py-2 transition-colors">
               <Thermometer className="h-5 w-5 text-purple-600 dark:text-purple-400" />
               <span className="font-semibold text-gray-900 dark:text-gray-100">
-                {currentTemp !== null ? currentTemp : "--"}
+                {currentTemp !== null ? Math.round(currentTemp) : "--"}
               </span>
               <span className="text-gray-500 dark:text-gray-400">°{tempUnit}</span>
             </button>
