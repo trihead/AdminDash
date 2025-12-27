@@ -27,7 +27,7 @@ interface WeatherDay {
   temp: number;
   tempMin?: number;
   tempMax?: number;
-  condition: "sunny" | "cloudy" | "rainy" | "partly-cloudy" | "snow" | "windy";
+  condition: string;
   precipitation: number;
 }
 
@@ -37,17 +37,37 @@ interface WeatherData {
   currentTemp?: number;
 }
 
-const WeatherIcon = ({ condition, className = "w-8 h-8" }: { condition: string; className?: string }) => {
-  switch (condition) {
-    case "sunny":
-      return <Sun className={`${className} text-yellow-400`} />;
-    case "cloudy":
-      return <Cloud className={`${className} text-gray-400`} />;
-    case "rainy":
-      return <CloudRain className={`${className} text-blue-400`} />;
-    default:
-      return <Sun className={`${className} text-yellow-400`} />;
+const getWeatherBackground = (condition: string) => {
+  const cond = condition.toLowerCase();
+  
+  if (cond.includes("clear") || cond.includes("sunny")) {
+    return "bg-gradient-to-br from-blue-400 via-blue-500 to-blue-600";
+  } else if (cond.includes("cloud")) {
+    return "bg-gradient-to-br from-gray-400 via-gray-500 to-gray-600";
+  } else if (cond.includes("rain") || cond.includes("drizzle")) {
+    return "bg-gradient-to-br from-blue-700 via-blue-800 to-purple-900";
+  } else if (cond.includes("snow")) {
+    return "bg-gradient-to-br from-blue-200 via-blue-300 to-blue-400";
+  } else if (cond.includes("thunder") || cond.includes("storm")) {
+    return "bg-gradient-to-br from-gray-700 via-gray-800 to-gray-900";
   }
+  
+  // Default blue gradient
+  return "bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800";
+};
+
+const WeatherIcon = ({ condition, className = "w-8 h-8" }: { condition: string; className?: string }) => {
+  const cond = condition.toLowerCase();
+  
+  if (cond.includes("clear") || cond.includes("sunny")) {
+    return <Sun className={`${className} text-yellow-300`} />;
+  } else if (cond.includes("cloud")) {
+    return <Cloud className={`${className} text-white/90`} />;
+  } else if (cond.includes("rain") || cond.includes("drizzle")) {
+    return <CloudRain className={`${className} text-blue-200`} />;
+  }
+  
+  return <Sun className={`${className} text-yellow-300`} />;
 };
 
 export function WeatherWidget() {
@@ -169,9 +189,10 @@ export function WeatherWidget() {
 
   const currentDay = weather.forecast[0];
   const upcomingDays = weather.forecast.slice(0, 5);
+  const bgClass = getWeatherBackground(currentDay.condition);
 
   return (
-    <Card className="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 text-white border-0 overflow-hidden">
+    <Card className={`${bgClass} text-white border-0 overflow-hidden`}>
       <CardContent className="p-6">
         {/* Header with Location */}
         <div className="flex items-center justify-between mb-4">
