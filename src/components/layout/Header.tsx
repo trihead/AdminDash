@@ -37,6 +37,8 @@ interface HeaderProps {
 export function Header({ onMenuClick, sidebarOpen, onSidebarToggle }: HeaderProps) {
   const { theme, toggleTheme } = useTheme();
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [currentTemp, setCurrentTemp] = useState<number | null>(null);
+  const [tempUnit, setTempUnit] = useState<string>("C");
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -46,6 +48,11 @@ export function Header({ onMenuClick, sidebarOpen, onSidebarToggle }: HeaderProp
       document.exitFullscreen();
       setIsFullscreen(false);
     }
+  };
+
+  const handleWeatherUpdate = (temp: number, unit: string) => {
+    setCurrentTemp(temp);
+    setTempUnit(unit);
   };
 
   return (
@@ -81,13 +88,13 @@ export function Header({ onMenuClick, sidebarOpen, onSidebarToggle }: HeaderProp
         {/* Right Side Actions */}
         <div className="flex items-center gap-1 ml-auto">
           {/* Temperature */}
-          <WeatherDialog>
+          <WeatherDialog onWeatherUpdate={handleWeatherUpdate}>
             <button className="flex items-center gap-2 text-sm px-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg py-2 transition-colors">
               <Thermometer className="h-5 w-5 text-purple-600 dark:text-purple-400" />
               <span className="font-semibold text-gray-900 dark:text-gray-100">
-                26
+                {currentTemp !== null ? currentTemp : "--"}
               </span>
-              <span className="text-gray-500 dark:text-gray-400">°C</span>
+              <span className="text-gray-500 dark:text-gray-400">°{tempUnit}</span>
             </button>
           </WeatherDialog>
           {/* Language Selector */}
@@ -228,7 +235,6 @@ export function Header({ onMenuClick, sidebarOpen, onSidebarToggle }: HeaderProp
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src="/avatar-placeholder.jpg" alt="User" />
                   <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-xs">
                     AS
                   </AvatarFallback>

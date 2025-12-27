@@ -3,6 +3,7 @@ import { ProjectCard } from "@/components/dashboard/ProjectCard";
 import { TimeTracker } from "@/components/dashboard/TimeTracker";
 import { ProjectStatusTable } from "@/components/dashboard/ProjectStatusTable";
 import { RevenueChart } from "@/components/dashboard/RevenueChart";
+import { WeatherWidget } from "@/components/dashboard/WeatherWidget";
 
 const projects = [
   {
@@ -79,11 +80,18 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Project Cards Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {projects.slice(3).map((project, index) => (
-          <ProjectCard key={index} {...project} />
-        ))}
+      {/* Weather Forecast and Project Cards */}
+      <div className="grid grid-cols-1 lg:grid-cols-6 gap-6">
+        <div className="lg:col-span-2">
+          <ProjectCard {...projects[2]} />
+        </div>
+        <div className="lg:col-span-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {projects.slice(3).map((project, index) => (
+              <ProjectCard key={index} {...project} />
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Revenue Chart */}

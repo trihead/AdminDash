@@ -1,17 +1,73 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
+// Timezone mapping helper
+const getTimezoneFromIANA = (ianaTimezone: string): string => {
+  const mapping: { [key: string]: string } = {
+    "America/New_York": "america-new-york",
+    "America/Chicago": "america-chicago",
+    "America/Denver": "america-denver",
+    "America/Los_Angeles": "america-los-angeles",
+    "Europe/London": "europe-london",
+    "Europe/Paris": "europe-paris",
+    "Asia/Tokyo": "asia-tokyo",
+    "Asia/Shanghai": "asia-shanghai",
+    "Australia/Sydney": "australia-sydney",
+  };
+  return mapping[ianaTimezone] || "america-los-angeles";
+};
+
 export default function LocalizationPage() {
+  const [autoDetect, setAutoDetect] = useState(false);
+  const [selectedTimezone, setSelectedTimezone] = useState("america-los-angeles");
+  const [currentTime, setCurrentTime] = useState("");
+
+  useEffect(() => {
+    // Update current time
+    const updateTime = () => {
+      const now = new Date();
+      const timeString = now.toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      });
+      const dateString = now.toLocaleDateString("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      });
+      setCurrentTime(`${timeString} (${dateString})`);
+    };
+    
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleAutoDetect = (enabled: boolean) => {
+    setAutoDetect(enabled);
+    if (enabled) {
+      // Detect user's timezone using browser API
+      const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const mappedTimezone = getTimezoneFromIANA(userTimezone);
+      setSelectedTimezone(mappedTimezone);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
-          Localization Settings
+          Regional & Localization Settings
         </h1>
         <p className="text-gray-500 dark:text-gray-400">
-          Configure language and regional preferences
+          Configure language, time zone, and regional preferences
         </p>
       </div>
 
@@ -42,6 +98,111 @@ export default function LocalizationPage() {
                 <SelectItem value="zh-tw">繁體中文</SelectItem>
                 <SelectItem value="ja">日本語</SelectItem>
                 <SelectItem value="ko">한국어</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Time Zone */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Time Zone</CardTitle>
+          <CardDescription>
+            Select your preferred time zone for the application
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="timezone">Time Zone</Label>
+            <Select 
+              value={selectedTimezone} 
+              onValueChange={setSelectedTimezone}
+              disabled={autoDetect}
+            >
+              <SelectTrigger id="timezone" className={autoDetect ? "opacity-50" : ""}>
+                <SelectValue placeholder="Select time zone" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="america-new-york">(GMT-5:00) Eastern Time - New York</SelectItem>
+                <SelectItem value="america-chicago">(GMT-6:00) Central Time - Chicago</SelectItem>
+                <SelectItem value="america-denver">(GMT-7:00) Mountain Time - Denver</SelectItem>
+                <SelectItem value="america-los-angeles">(GMT-8:00) Pacific Time - Los Angeles</SelectItem>
+                <SelectItem value="europe-london">(GMT+0:00) London</SelectItem>
+                <SelectItem value="europe-paris">(GMT+1:00) Paris</SelectItem>
+                <SelectItem value="asia-tokyo">(GMT+9:00) Tokyo</SelectItem>
+                <SelectItem value="asia-shanghai">(GMT+8:00) Shanghai</SelectItem>
+                <SelectItem value="australia-sydney">(GMT+11:00) Sydney</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-gray-500">
+              Current time: {currentTime}
+            </p>
+          </div>
+
+          <div className="flex items-start justify-between pt-2">
+            <div className="space-y-1">
+              <Label htmlFor="auto-detect">Auto-detect time zone</Label>
+              <p className="text-xs text-gray-500">
+                Automatically update time zone based on your location
+              </p>
+            </div>
+            <Switch 
+              id="auto-detect"
+              checked={autoDetect}
+              onCheckedChange={handleAutoDetect}
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Date & Time Format */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Date & Time Format</CardTitle>
+          <CardDescription>
+            Customize how dates and times are displayed
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="date-format">Date Format</Label>
+            <Select defaultValue="mm-dd-yyyy">
+              <SelectTrigger id="date-format">
+                <SelectValue placeholder="Select date format" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="mm-dd-yyyy">MM/DD/YYYY (12/27/2025)</SelectItem>
+                <SelectItem value="dd-mm-yyyy">DD/MM/YYYY (27/12/2025)</SelectItem>
+                <SelectItem value="yyyy-mm-dd">YYYY-MM-DD (2025-12-27)</SelectItem>
+                <SelectItem value="dd-mmm-yyyy">DD MMM YYYY (27 Dec 2025)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="time-format">Time Format</Label>
+            <Select defaultValue="12-hour">
+              <SelectTrigger id="time-format">
+                <SelectValue placeholder="Select time format" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="12-hour">12-hour (2:30 PM)</SelectItem>
+                <SelectItem value="24-hour">24-hour (14:30)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="first-day">First Day of Week</Label>
+            <Select defaultValue="sunday">
+              <SelectTrigger id="first-day">
+                <SelectValue placeholder="Select first day" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="sunday">Sunday</SelectItem>
+                <SelectItem value="monday">Monday</SelectItem>
+                <SelectItem value="saturday">Saturday</SelectItem>
               </SelectContent>
             </Select>
           </div>

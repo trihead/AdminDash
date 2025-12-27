@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
-  Clock,
   Building2,
   Plug,
   Bell,
@@ -20,12 +19,6 @@ const settingsNavigation = [
     href: "/settings",
     icon: Building2,
     description: "Company and user information",
-  },
-  {
-    name: "Time Zone",
-    href: "/settings/timezone",
-    icon: Clock,
-    description: "Configure time zone settings",
   },
   {
     name: "Integrations",
@@ -52,10 +45,10 @@ const settingsNavigation = [
     description: "Customize look and feel",
   },
   {
-    name: "Localization",
+    name: "Regional",
     href: "/settings/localization",
     icon: Globe,
-    description: "Language and regional settings",
+    description: "Language, time zone, and regional settings",
   },
   {
     name: "Team",

@@ -24,6 +24,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { useState } from "react";
+import { useCompany } from "@/contexts/CompanyContext";
 
 interface SubNavItem {
   name: string;
@@ -132,6 +133,7 @@ export function Sidebar({ isOpen, onClose, isMobile = false }: SidebarProps) {
   const pathname = usePathname();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [isHovered, setIsHovered] = useState(false);
+  const { company } = useCompany();
 
   const toggleExpand = (itemName: string) => {
     setExpandedItems((prev) =>
@@ -155,14 +157,26 @@ export function Sidebar({ isOpen, onClose, isMobile = false }: SidebarProps) {
       )}
     >
       {/* Logo Area */}
-      <div className="flex h-16 items-center justify-between px-4 border-b border-gray-200 dark:border-gray-700">
+      <div className="flex h-16 items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
         {showExpanded && (
           <>
             <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">AD</span>
-              </div>
-              <span className="font-semibold text-lg text-gray-900 dark:text-white">AdminDash</span>
+              {company.logo ? (
+                <img 
+                  src={company.logo} 
+                  alt={company.name}
+                  className="w-10 h-10 object-contain"
+                />
+              ) : (
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center p-1">
+                  <span className="text-white font-bold text-sm">
+                    {company.name.substring(0, 2).toUpperCase()}
+                  </span>
+                </div>
+              )}
+              <span className="font-semibold text-lg text-gray-900 dark:text-white">
+                {company.name}
+              </span>
             </Link>
             {isMobile && (
               <Button
@@ -178,9 +192,19 @@ export function Sidebar({ isOpen, onClose, isMobile = false }: SidebarProps) {
         )}
         {!showExpanded && !isMobile && (
           <div className="w-full flex justify-center">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xs">AD</span>
-            </div>
+            {company.logo ? (
+              <img 
+                src={company.logo} 
+                alt={company.name}
+                className="w-8 h-8 object-contain"
+              />
+            ) : (
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-xs">
+                  {company.name.substring(0, 2).toUpperCase()}
+                </span>
+              </div>
+            )}
           </div>
         )}
       </div>
