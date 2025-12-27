@@ -20,7 +20,7 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "AdminDash - ERP Dashboard",
+  title: process.env.NEXT_PUBLIC_COMPANY_NAME || "AdminDash - ERP Dashboard",
   description: "Modern ERP admin dashboard built with Next.js and shadcn/ui",
 };
 
