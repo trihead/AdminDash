@@ -16,6 +16,7 @@ import {
   ChevronRight,
   X,
   ChevronDown,
+  Settings,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -102,8 +103,6 @@ const navigation: NavSection[] = [
         href: "/advanced-ui",
         badge: "12+",
       },
-      { name: "Icons", icon: Smile, href: "/icons" },
-      { name: "Misc", icon: MoreHorizontal, href: "/misc" },
     ],
   },
   {
@@ -113,6 +112,12 @@ const navigation: NavSection[] = [
       { name: "Chart", icon: BarChart, href: "/chart" },
       { name: "Table & forms", icon: Table, href: "/tables", badge: "4.2" },
       { name: "Spreadsheet", icon: Table, href: "/spreadsheet" },
+    ],
+  },
+  {
+    section: "System",
+    items: [
+      { name: "Settings", icon: Settings, href: "/settings" },
     ],
   },
 ];
